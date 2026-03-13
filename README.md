@@ -1,5 +1,7 @@
 # poop
 
+> **Disclaimer:** This project is a joke. It is 100% AI-generated slop. It was vibe-coded into existence by mass-prompting Claude while complaining about VLC in a Discord server. It probably works. No promises.
+
 **P**lays **O**nly **O**pen **P**layback.
 
 A 250-line music player that does what VLC has failed to do for decades: play your music without hanging, crashing, or forgetting how HTTP works.
