@@ -4,14 +4,14 @@
 
 **P**lays **O**nly **O**pen **P**layback.
 
-A 250-line music player that does what VLC has failed to do for decades: play your music without hanging, crashing, or forgetting how HTTP works.
+A music player that does what VLC has failed to do for decades: play your music without hanging, crashing, or forgetting how HTTP works.
 
 ## Why not VLC?
 
 - VLC **hangs at the end of MP3 files**. Just sits there. Silence. You have to babysit it.
 - VLC's HTTP remote interface **breaks after a few commands**. Every time. It's been like this for years.
 - VLC's shuffle is "random" the way a toddler is "random" — it plays the same three songs and ignores the rest.
-- VLC is **3.5 million lines of C**. poop is 250 lines of Python. Guess which one has fewer bugs.
+- VLC is **3.5 million lines of C**. poop is a single Python file. Guess which one has fewer bugs.
 
 poop doesn't hang. poop doesn't break. poop doesn't forget what "shuffle" means.
 
@@ -19,7 +19,8 @@ poop doesn't hang. poop doesn't break. poop doesn't forget what "shuffle" means.
 
 - Scans a directory for audio files
 - Plays them in **weighted random** order — recently played tracks are suppressed, so you actually hear your whole library
-- Exposes a dead-simple **HTTP API** for remote control
+- **Web remote** at `http://localhost:8888` — control from your phone, cast to Chromecast
+- **HTTP API** for scripting — `curl`, webhooks, Shortcuts, whatever
 - Uses `ffplay` under the hood — each track is a clean subprocess that exits when it's done. No hanging. Ever.
 
 ## Install
@@ -28,7 +29,7 @@ poop doesn't hang. poop doesn't break. poop doesn't forget what "shuffle" means.
 brew install ffmpeg   # or however you get ffplay on your system
 ```
 
-That's it. No pip install. No virtualenv. No requirements.txt. Just Python 3 and ffmpeg.
+That's it. Just Python 3 and ffmpeg. Add `pychromecast` if you want to cast.
 
 ## Usage
 
@@ -36,7 +37,7 @@ That's it. No pip install. No virtualenv. No requirements.txt. Just Python 3 and
 python3 poop.py ~/Music
 ```
 
-Starts playing immediately. API runs on port 8888 by default.
+Open `http://localhost:8888` for the web remote. Hit play, pick a Chromecast, whatever you want.
 
 ```bash
 python3 poop.py ~/Music -p 9999   # custom port
@@ -46,15 +47,20 @@ python3 poop.py ~/Music -p 9999   # custom port
 
 All endpoints are `GET` and return JSON. Control your music from `curl`, a browser, a webhook, a Shortcut, whatever.
 
-| Endpoint  | What it does |
-|-----------|-------------|
-| `/play`   | Start or resume playback |
-| `/pause`  | Toggle pause/resume |
-| `/next`   | Skip to next track (weighted random) |
-| `/prev`   | Go back to previous track |
-| `/stop`   | Stop playback |
-| `/status` | Current track, position, duration, state |
-| `/queue`  | All tracks with their current shuffle weights |
+| Endpoint          | What it does |
+|-------------------|-------------|
+| `/`               | Web remote control |
+| `/play`           | Start or resume playback |
+| `/pause`          | Toggle pause/resume |
+| `/next`           | Skip to next track (weighted random) |
+| `/prev`           | Go back to previous track |
+| `/stop`           | Stop playback |
+| `/status`         | Current track, position, duration, state |
+| `/queue`          | All tracks with their current shuffle weights |
+| `/cast-list`      | List Chromecast devices on the network |
+| `/cast?device=`   | Cast to a Chromecast by name |
+| `/cast-stop`      | Disconnect from Chromecast |
+| `/audio/<index>`  | Stream a track by index |
 
 ### Examples
 
@@ -78,6 +84,14 @@ poop maintains a play history. A track's shuffle weight is based on how long ago
 - **Played a while ago** → weight gradually recovers
 
 The result: you hear your entire library instead of the same 10 songs on repeat. This is what VLC's shuffle should have been since 2001.
+
+## Cast to Chromecast
+
+```bash
+pip install pychromecast
+python3 poop.py ~/Music
+# open http://localhost:8888, pick your Chromecast from the dropdown, hit Cast
+```
 
 ## Supported formats
 
